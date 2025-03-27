@@ -1,0 +1,60 @@
+﻿ @page "/"
+@using VMSalesApp.Services.Model
+@using VMSalesApp.UI.Components
+@using VMSalesApp.Services.Model
+
+@inject HttpClient HttpClient
+
+<table class="table table-striped table-hover">
+    <thead>
+        <tr>
+            <th>@nameof(Sale.Segment)</th>
+            <th>@nameof(Sale.Country)</th>
+            <th> @nameof(Sale.Product)</th>
+            <th>@nameof(Sale.Discount)</th>
+            <th>@nameof(Sale.UnitsSold) </th>
+            <th>@nameof(Sale.ManufacturingPrice)</th>
+            <th>@nameof(Sale.SalePrice)</th>
+            <th>@nameof(Sale.Date) </th>
+        </tr>     
+    </thead>
+    <tbody>
+        @if (SalesData.Any())
+        {
+            @foreach (var sale in SalesData)
+            {
+                <tr>
+                    <td>@sale.Segment</td>
+                    <td>@sale.Country</td>
+                    <td>@sale.Product</td>
+                    <td>@sale.Discount</td>
+                    <td>@sale.UnitsSold</td>
+                    <td>@sale.ManufacturingPrice.ToString("C")</td>
+                    <td>@sale.SalePrice.ToString("C")</td>
+                    <td>@sale.Date.ToShortDateString()</td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr><td colspan="8">No matching records found.</td></tr>
+        }
+    </tbody>
+</table>
+
+
+@code {
+    private List<Sale> SalesData = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            SalesData = await HttpClient.GetFromJsonAsync<List<Sale>>("api/Sales/") ?? new();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching sales data: {ex.Message}");
+        }
+    }
+}
